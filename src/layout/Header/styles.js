@@ -1,20 +1,39 @@
-import { styled } from "@mui/material/styles";
-import MuiAppBar from "@mui/material/AppBar";
+import { styled } from '@mui/material/styles';
+import MuiAppBar from '@mui/material/AppBar';
+import InputBase from '@mui/material/InputBase';
 
-import { drawerWidth } from "../Drawer/styles";
+import { drawerWidth } from '../Drawer/styles';
+
+export const CurrencyInput = styled(InputBase)(({ theme }) => ({
+  'label + &': {
+    marginTop: theme.spacing(3),
+  },
+  '& .MuiInputBase-input': {
+    borderRadius: 4,
+    position: 'relative',
+    backgroundColor: theme.palette.background.paper,
+    border: '1px solid #ced4da',
+    fontSize: 16,
+    padding: '10px 26px 10px 12px',
+    transition: theme.transitions.create(['border-color', 'box-shadow']),
+    '&:focus': {
+      borderRadius: 4,
+    },
+  },
+}));
 
 export const AppBar = styled(MuiAppBar, {
-  shouldForwardProp: (prop) => prop !== "open",
+  shouldForwardProp: (prop) => prop !== 'open',
 })(({ theme, open }) => ({
   // zIndex: theme.zIndex.drawer + 1,
-  transition: theme.transitions.create(["width", "margin"], {
+  transition: theme.transitions.create(['width', 'margin'], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
   ...(open && {
     marginLeft: drawerWidth,
     width: `calc(100% - ${drawerWidth}px)`,
-    transition: theme.transitions.create(["width", "margin"], {
+    transition: theme.transitions.create(['width', 'margin'], {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.enteringScreen,
     }),
@@ -24,36 +43,36 @@ export const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-export const ToolBarWrapper = styled("div")(() => ({
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-  width: "100%",
+export const ToolBarWrapper = styled('div')(() => ({
+  display: 'flex',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  width: '100%',
 }));
 
-export const WalletWrapper = styled("div")(({ theme }) => ({
+export const WalletWrapper = styled('div')(({ theme }) => ({
   padding: `0px ${theme.spacing(2)}`,
   // borderRight: `1px solid ${theme.palette.primary.light}`,
-  display: "flex",
-  alignItems: "center",
+  display: 'flex',
+  alignItems: 'center',
   width: 220,
 }));
 
-export const WalletInfo = styled("div")(({ theme }) => ({
+export const WalletInfo = styled('div')(({ theme }) => ({
   padding: `0px ${theme.spacing(2)}`,
-  width: "100%",
+  width: '100%',
 }));
 
-export const WalletDetails = styled("div")(() => ({
-  width: "500px",
-  display: "flex",
-  justifyContent: "flex-start",
+export const WalletDetails = styled('div')(() => ({
+  width: '500px',
+  display: 'flex',
+  justifyContent: 'flex-start',
 }));
 
-export const CurrencyWrapper = styled("div")(({ theme }) => ({
+export const CurrencyWrapper = styled('div')(({ theme }) => ({
   /* padding: `0px ${theme.spacing(2)}`, */
   // borderLeft: `1px solid ${theme.palette.primary.light}`,
-  display: "flex",
-  alignItems: "center",
+  display: 'flex',
+  alignItems: 'center',
   width: 120,
 }));
