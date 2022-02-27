@@ -9,6 +9,14 @@ import { AppBar } from './AppBar';
 import { AppDrawer } from './Drawer';
 import { Header } from './Header';
 
+const Styles = {
+  content: {
+    flexGrow: 1,
+    pt: 10,
+    pb: 5,
+  },
+};
+
 export const Layout = ({ children }) => {
   const [open, setOpen] = useState(false);
 
@@ -23,7 +31,7 @@ export const Layout = ({ children }) => {
         </Toolbar>
       </AppBar>
       <AppDrawer toggleDrawer={toggleDrawer} open={open} />
-      <Box component="main" sx={{ flexGrow: 1, pt: 10 }}>
+      <Box component="main" sx={Styles.content}>
         {children}
       </Box>
     </Box>

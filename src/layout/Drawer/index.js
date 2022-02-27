@@ -1,14 +1,15 @@
-import { useRouter } from "next/router";
+import { Box } from '@mui/material';
+import { useRouter } from 'next/router';
 
-import Fade from "@mui/material/Fade";
-import IconButton from "@mui/material/IconButton";
-import MenuIcon from "@mui/icons-material/Menu";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import List from "@mui/material/List";
+import Fade from '@mui/material/Fade';
+import ListItemIcon from '@mui/material/ListItemIcon';
+import ListItemText from '@mui/material/ListItemText';
+import List from '@mui/material/List';
 
-import navigation, { misc } from "./navigation";
-import { Drawer, DrawerHeader, ListItem, MiscLinksWrapper } from "./styles";
+import logImg from '@assets/images/stream-money-logo-img.png';
+import navigation, { misc } from './navigation';
+import { Drawer, DrawerHeader, ListItem, MiscLinksWrapper } from './styles';
+import Image from 'next/image';
 
 export const AppDrawer = ({ toggleDrawer, open }) => {
   const { push } = useRouter();
@@ -27,9 +28,14 @@ export const AppDrawer = ({ toggleDrawer, open }) => {
   return (
     <Drawer variant="permanent" open={open}>
       <DrawerHeader>
-        <IconButton onClick={toggleDrawer}>
-          <MenuIcon />
-        </IconButton>
+        <Box onClick={toggleDrawer} sx={{ cursor: 'pointer' }}>
+          <Image
+            src={logImg}
+            alt="stream-money-logo"
+            width="56px"
+            height="80px"
+          />
+        </Box>
       </DrawerHeader>
 
       <List>{navigation.map(renderNavs)}</List>
