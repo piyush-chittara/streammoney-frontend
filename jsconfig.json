@@ -3,9 +3,11 @@
     "baseUrl": ".",
     "paths": {
       "@shared/*": ["./src/modules/shared/*"],
+      "@modules/*": ["./src/modules/*"],
       "@utils/*": ["./src/utils/*"],
       "@constants/*": ["./src/constants/*"],
-      "@hooks/*": ["./src/hooks/*"]
+      "@hooks/*": ["./src/hooks/*"],
+      "@assets/*": ["./src/assets/*"]
     }
   },
   "exclude": ["node_modules"]
