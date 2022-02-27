@@ -1,6 +1,8 @@
-const getPriceFormatter = (locale = "en-US", currency = "USD") =>
+import { isNumber } from './object-helpers';
+
+const getPriceFormatter = (locale = 'en-US', currency = 'USD') =>
   new Intl.NumberFormat(locale, {
-    style: "currency",
+    style: 'currency',
     currency,
   });
 
@@ -10,12 +12,27 @@ export const priceToString = (price, { currency, locale } = {}) => {
   return priceFormatter.format(price);
 };
 
+export const formatDate = (date, options = {}) =>
+  new Intl.DateTimeFormat('en-US', {
+    ...options,
+  }).format(date);
+
 export const capitalize = (str) => {
   return (
     str &&
     str.replace(
       /\w\S*/g,
-      (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+      (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(),
     )
   );
+};
+
+export const getAvatarSymbol = (userId) => {
+  if (!userId?.length) return 'A';
+
+  return userId.charAt(0).toUpperCase();
+};
+
+export const roundTo = (value, noOfDecimal = 2) => {
+  return isNumber(value) ? value.toFixed(noOfDecimal) : value;
 };
