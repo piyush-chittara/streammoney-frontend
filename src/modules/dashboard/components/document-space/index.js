@@ -1,6 +1,6 @@
-import PropTypes from 'prop-types';
-import { Container, Typography, Box, Stack, Button } from '@mui/material';
+import { Container, Typography, Box } from '@mui/material';
 
+import { Button } from '@shared/components/button';
 import { Paper } from '@shared/components/paper';
 
 export const DocumentSpace = () => {
@@ -25,12 +25,7 @@ export const DocumentSpace = () => {
         </Box>
         <Button
           sx={{
-            backgroundColor: 'success.light',
             marginTop: 4,
-            color: 'common.white',
-            ':hover': {
-              backgroundColor: 'success.main',
-            },
           }}
         >
           Leave your feedback
