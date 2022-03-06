@@ -12,3 +12,4 @@ export const FunctionOrJSX = PropTypes.oneOfType([
 ]);
 
 export const OneOf = (array = []) => PropTypes.oneOf([...array]);
+export const OneOfType = (array = []) => PropTypes.oneOfType([...array]);

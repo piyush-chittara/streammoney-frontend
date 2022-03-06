@@ -8,7 +8,11 @@ export const TableHead = ({ columns }) => {
   const renderHeader = (header) => {
     if (typeof header === 'function') return header();
 
-    return <Typography variant="button">{header}</Typography>;
+    return (
+      <Typography variant="button" fontSize="12px">
+        {header}
+      </Typography>
+    );
   };
 
   return (
