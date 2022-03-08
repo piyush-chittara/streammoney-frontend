@@ -15,30 +15,6 @@ import { useEffect, useState } from 'react';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 
-// sol to lamport 10^9;
-//const BufferLayout = require("buffer-layout");
-
-//
-// const initLayout = BufferLayout.struct([
-//   BufferLayout.u8("instruction"),
-//   BufferLayout.u32("starttime"),
-//   BufferLayout.u32("endtime"),
-//   // N.B. Use something else, this goes up to 2^53
-//   BufferLayout.nu64("amount"),
-// ]);
-
-// // This is the structure for the withdraw instruction
-// const withdrawLayout = BufferLayout.struct([
-//   BufferLayout.u8("instruction"),
-//   // N.B. Use something else, this goes up to 2^53
-//   BufferLayout.nu64("amount"),
-// ]);
-
-// // This is the structure for the cancel instruction
-// const cancelLayout = BufferLayout.struct([
-//   BufferLayout.u8("instruction"),
-// ]);
-
 
 function MyWallet() {
 
@@ -46,9 +22,6 @@ function MyWallet() {
 
 
   const { connection} = useConnection();
-
-
-
 
   const [balance, setBalance] = useState(0);
 
@@ -63,74 +36,13 @@ function MyWallet() {
 
   const [subject, setSubject] = useState('');
 
-
-
-
   useEffect(() => {
     if(wallet.connected && wallet.publicKey) {
       setAddress(wallet.publicKey.toString())
     }
   },[address, wallet])
 
-  async function initStream(connection) {
-    // Current time as Unix timestamp
-    now = Math.floor(new Date().getTime() / 1000);
 
-    var data = Buffer.alloc(initLayout.span);
-    initLayout.encode({
-            // 0 means init in the Rust program.
-            instruction: 0,
-            // Unix timestamp when the stream should start unlocking.
-            starttime: now + 10,
-            // Unix timestamp when the stream should finish and unlock everything.
-            endtime: now + 610,
-            // Lamports to stream
-            amount: 100000000,
-        },
-        data,
-    );
-
-    // pda is a new keypair where the funds are sent, and program metadata
-    // is kept and updated by the program.
-    const pda = new sol.Keypair();
-
-    console.log("ALICE: %s", alice.publicKey.toBase58());
-    console.log("BOB:   %s", bob.publicKey.toBase58());
-    console.log("PDA:   %s", pda.publicKey.toBase58());
-    console.log("DATA:", data);
-
-    const instruction = new sol.TransactionInstruction({
-        keys: [{
-            // Alice is the stream sender.
-            pubkey: alice.publicKey,
-            isSigner: true,
-            isWritable: true,
-        }, {
-            // Bob is the stream recipient.
-            pubkey: bob.publicKey,
-            isSigner: false,
-            isWritable: true,
-        }, {
-            // pda is the account that will be created.
-            // It shall contain the locked funds and necessary metadata.
-            pubkey: pda.publicKey,
-            isSigner: true,
-            isWritable: true,
-        }, {
-            // This is the system program public key.
-            pubkey: sol.SystemProgram.programId,
-            isSigner: false,
-            isWritable: false,
-        }],
-        programId: new sol.PublicKey(programAddr),
-        data: data,
-    });
-
-    // Transaction signed by Alice and the new pda.
-    tx = new sol.Transaction().add(instruction);
-    return await sol.sendAndConfirmTransaction(connection, tx, [alice, pda]);
-}
- 
   
   const handlePlayment = async () => {
     const { connected, publicKey } = wallet;
