@@ -128,13 +128,15 @@ const columns = [
 const filterFunction = (filters = {}, rows = []) => {
   const appliedFilters = Object.entries(filters);
 
-  return rows.filter((rowData) =>
-    appliedFilters.every(([key, value]) => {
-      if (value === '*') return true;
+  return appliedFilters.length
+    ? rows.filter((rowData) =>
+        appliedFilters.every(([key, value]) => {
+          if (value === '*') return true;
 
-      return rowData[key] === value;
-    }),
-  );
+          return rowData[key] === value;
+        }),
+      )
+    : rows;
 };
 
 export const StreamTable = ({ filters, resetFilters }) => {
