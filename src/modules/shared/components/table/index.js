@@ -7,7 +7,7 @@ import Paper from '@mui/material/Paper';
 import { TableHead } from './Tablehead';
 import { TableBody } from './TableBody';
 
-export const Table = ({ data, columns, isLoading, noData }) => {
+export const Table = ({ data = [], columns, isLoading, noData }) => {
   return (
     <TableContainer component={Paper} sx={{ borderColor: 'gray' }}>
       <MuiTable>

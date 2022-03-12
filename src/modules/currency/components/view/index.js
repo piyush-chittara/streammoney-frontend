@@ -8,7 +8,7 @@ import { CurrencyTable } from '../currency-table';
 export const CurrencyView = () => {
   return (
     <Container maxWidth="100%">
-      <JustifyBetween paddingX={4} paddingY={2}>
+      <JustifyBetween paddingY={2}>
         <Typography variant="h4">Currencies</Typography>
         <Button>Add Custom Token</Button>
       </JustifyBetween>

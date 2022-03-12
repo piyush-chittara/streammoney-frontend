@@ -33,6 +33,19 @@ export const getAvatarSymbol = (userId) => {
   return userId.charAt(0).toUpperCase();
 };
 
+export const ellipsedId = (string) => {
+  if (!string) return string;
+
+  return `${string.slice(0, 2)}...${string.slice(-5)}`;
+};
+
 export const roundTo = (value, noOfDecimal = 2) => {
   return isNumber(value) ? value.toFixed(noOfDecimal) : value;
+};
+
+export const formatTime = (date) => {
+  return `${formatDate(date, {
+    month: 'short',
+    day: 'numeric',
+  })}, ${formatDate(date, { timeStyle: 'short' })}`;
 };
