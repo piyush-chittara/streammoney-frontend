@@ -48,7 +48,7 @@ function getStyles(theme) {
 export const Select = ({
   value,
   onChange,
-  options,
+  options = [],
   renderOption,
   isDisabled,
   isInvalid,
