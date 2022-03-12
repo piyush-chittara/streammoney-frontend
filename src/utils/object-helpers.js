@@ -25,3 +25,27 @@ export const isBoolean = (val) => typeof val === 'boolean';
 export const isArray = (val) => Array.isArray(val);
 
 export const isEmpty = (val) => !val;
+
+/**
+ * @param {object} query - The key, value pairs for query params
+ *
+ * @returns {string} - The equivalent query string
+ * @example ?key1=value1&key2=value2
+ */
+export const jsonToQuery = (query) => {
+  let q = [];
+
+  Object.keys(query).forEach((key) => {
+    if (query[key] || (key === 'q' && query[key] === '')) {
+      const querySegment = Array.isArray(query[key])
+        ? query[key].map((f) => `${key}=${f}`)
+        : `${key}=${query[key]}`;
+
+      q = q.concat(querySegment);
+    }
+  });
+
+  const string = q.join('&');
+
+  return string ? `?${string}` : string;
+};

@@ -3,4 +3,5 @@ export const CRYPTO_NAME = {
   solana: 'SOL',
   ripple: 'XRP',
   bitcoin: 'BTC',
+  binance: 'BNB',
 };
