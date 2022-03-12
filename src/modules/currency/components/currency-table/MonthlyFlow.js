@@ -36,7 +36,7 @@ export const NetFlow = ({ netFlow }) => {
       {netFlow > 0 ? (
         <ArrowDropUpIcon color="success" />
       ) : (
-        <ArrowDropUpIcon color="error" />
+        <ArrowDropDownIcon color="error" />
       )}
     </JustifyStart>
   );
