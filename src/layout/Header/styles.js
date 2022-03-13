@@ -64,7 +64,7 @@ export const WalletInfo = styled('div')(({ theme }) => ({
 }));
 
 export const WalletDetails = styled('div')(() => ({
-  width: '500px',
+  minWidth: '100%',
   display: 'flex',
   justifyContent: 'flex-start',
 }));
