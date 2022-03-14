@@ -3,9 +3,9 @@ import BufferLayout from 'buffer-layout';
 // sol to lamport 10^9;
 //const BufferLayout = require("buffer-layout");
 
-const programAddr = "2DvvSEde36Ch3B52g9hKWDYbfmJimLpJwVBV9Cknypi4"
+const programAddr = "8B6xv2wbTjUawgV8tvPJwZtVdQ5V1qAXnmGpCbfs688E"
 
-const initLayout = BufferLayout.struct([
+export const initLayout = BufferLayout.struct([
   BufferLayout.u8('instruction'),
   BufferLayout.u32('starttime'),
   BufferLayout.u32('endtime'),
@@ -14,19 +14,19 @@ const initLayout = BufferLayout.struct([
 ]);
 
 // This is the structure for the withdraw instruction
-const withdrawLayout = BufferLayout.struct([
+export  const withdrawLayout = BufferLayout.struct([
   BufferLayout.u8('instruction'),
   // N.B. Use something else, this goes up to 2^53
   BufferLayout.nu64('amount'),
 ]);
 
 // This is the structure for the cancel instruction
-const cancelLayout = BufferLayout.struct([BufferLayout.u8('instruction')]);
+export const cancelLayout = BufferLayout.struct([BufferLayout.u8('instruction')]);
 
 
-async function initStream(connection) {
+export async function initStream(connection) {
   // Current time as Unix timestamp
-  now = Math.floor(new Date().getTime() / 1000);
+  var now = Math.floor(new Date().getTime() / 1000);
 
   var data = Buffer.alloc(initLayout.span);
   initLayout.encode(
