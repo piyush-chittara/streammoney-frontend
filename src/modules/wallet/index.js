@@ -1,27 +1,20 @@
 import { Button, Container, Divider, FormControl, Input, InputLabel, Select , MenuItem,Text, TextField, Box, Typography} from '@mui/material';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 
-import {
-  useAnchorWallet,
-  useConnection,
-  useWallet,
-} from '@solana/wallet-adapter-react';
-import {
-  WalletModalProvider,
-  WalletDisconnectButton,
-  WalletMultiButton,
-} from '@solana/wallet-adapter-react-ui';
-import { useEffect, useState } from 'react';
+
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 
+import React, { useState, useEffect } from 'react';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+
+
 
 function MyWallet() {
-
   const wallet = useWallet();
 
-
-  const { connection} = useConnection();
+  const {connection} = useConnection();
 
   const [balance, setBalance] = useState(0);
 
@@ -39,9 +32,19 @@ function MyWallet() {
   useEffect(() => {
     if(wallet.connected && wallet.publicKey) {
       setAddress(wallet.publicKey.toString())
-    }
-  },[address, wallet])
 
+     connection.getBalance(wallet.publicKey).then((data) => setBalance(data));
+
+      console.log(balance);
+    }
+  },[address, wallet, connection, balance])
+
+
+  async function initStream() {
+    // Current time as Unix timestamp
+    const  now = Math.floor(new Date().getTime() / 1000);
+
+  }
 
   
   const handlePlayment = async () => {
@@ -54,28 +57,26 @@ function MyWallet() {
 
   const history = async () => {
     const transactionHistory = await connection.getConfirmedSignaturesForAddress2(wallet.publicKey, {limit: 20})
-
     console.log(transactionHistory);
+  }
 
+  const getAirDrops = async () => {
+    const getAirDrops = await connection.requestAirdrop(wallet.publicKey, LAMPORTS_PER_SOL)
+
+    console.log(getAirDrops);
+
+    
   }
 
 
   return (
       <>
-        <div className="multi-wrapper">
-              <span className="button-wrapper">
-                  <WalletModalProvider>
-                      <WalletMultiButton />
-                  </WalletModalProvider>
-              </span>
-              
-          </div>
-          {wallet.connected &&
+        
           <Container>
+            <Typography>{balance}</Typography>
+            <Button onClick={getAirDrops}>Airdrops</Button>
             <LocalizationProvider dateAdapter={AdapterDateFns}> 
 
-               <p>Your wallet is {address}</p> 
-               <p>your Account value is  {balance}</p>
                <Button onClick={history}>Get transaction history</Button>
                <Divider/>
                <FormControl style={{display: 'flex', flexDirection:'column', marginTop:'50px', maxWidth:'400px'}}>
@@ -153,11 +154,7 @@ function MyWallet() {
               </LocalizationProvider>
               
           </Container>
-             ||
-              <p>Hello! Click the button to connect</p>
-             
-          }
-
+        
         
       </>
   );

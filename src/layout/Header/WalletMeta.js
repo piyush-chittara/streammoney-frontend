@@ -1,6 +1,18 @@
 import Typography from "@mui/material/Typography";
 import Avatar from "@mui/material/Avatar";
 
+import {
+  useAnchorWallet,
+  useConnection,
+  useWallet,
+} from '@solana/wallet-adapter-react';
+import {
+  WalletModalProvider,
+  WalletDisconnectButton,
+  WalletMultiButton,
+} from '@solana/wallet-adapter-react-ui';
+import { useEffect, useState } from 'react';
+
 import { WalletWrapper, WalletInfo } from "./styles";
 
 const style = {
@@ -12,22 +24,45 @@ const style = {
   },
 };
 
-export const WalletMeta = () => {
+export const WalletMeta = ({ addInfo}) => {
+
+  const wallet = useWallet();
+
+
+  const { connection} = useConnection();
+
+  const [address, setAddress] = useState('');
+
+  const [balance, setBalance] = useState(0);
+
+  const [amount, setAmount] = useState(0);
+
+  useEffect(() => {
+    if(wallet.connected && wallet.publicKey) {
+      setAddress(wallet.publicKey.toString())
+
+      // get account balance and set it 
+      // get transaction history as well 
+      //  check if the user has already created stream 
+    }
+  },[address, wallet])
+
+
   return (
-    <WalletWrapper>
-      <Avatar sx={style.avatar} variant="rounded">
-        P
-      </Avatar>
-      <WalletInfo>
-        <div>
-          <Typography variant="caption" sx={{ color: "primary.main" }}>
-            Personal Wallet
-          </Typography>
-        </div>
-        <Typography variant="caption" sx={{ color: "primary.light" }}>
-          0x834as8...2323
-        </Typography>
-      </WalletInfo>
-    </WalletWrapper>
+    <div className="multi-wrapper">
+              <span className="button-wrapper">
+                  <WalletModalProvider>
+                      <WalletMultiButton />
+                  </WalletModalProvider>
+              </span>
+
+          {/* {wallet.connected &&
+          <>
+            <p>Your wallet is {address}</p> 
+          <p>your Account value is  {balance}</p>
+          </>
+          } */}
+          </div>
+
   );
 };
