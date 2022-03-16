@@ -2,10 +2,7 @@ import BufferLayout from 'buffer-layout';
 // sol to lamport 10^9;
 const bs58 = require('bs58');
 import * as sol from '@solana/web3.js';
-
 export const programAddr = "5nVGqBwnBCvGKUxxrj6rVYqGVMhpEdDniRdDn22Vgtnk"
-// import { bs58 } from 'bs58';
-
 
 const cluster = sol.clusterApiUrl("devnet", true);
 
@@ -20,7 +17,6 @@ export const initLayout = BufferLayout.struct([
     BufferLayout.nu64('amount'),
     BufferLayout.u32('totalEvents'),
     BufferLayout.u32('triggeredEvents'),
-    BufferLayout.u32('streamResumeTime'),
   ]);
 
   export async function initStreamNew(connection, alice) {
@@ -42,7 +38,6 @@ export const initLayout = BufferLayout.struct([
         amount: 1,
         totalEvents: 0,
         triggeredEvents: 0,
-        streamResumeTime: now +10,
       },
       data,
     );
