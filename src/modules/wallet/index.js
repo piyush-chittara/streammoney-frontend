@@ -1,71 +1,99 @@
 import { Button, Container, Divider, FormControl, Input, InputLabel, Select , MenuItem,Text, TextField, Box, Typography} from '@mui/material';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
-
+import { base58_to_binary } from 'base58-js';
 
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
-
-import React, { useState, useEffect } from 'react';
+import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { User } from 'src/context/UserContext';
+
+import {initLayout,programAddr, initStream} from './utils'
+
+import { Keypair, SystemProgram,PublicKey,  Transaction, TransactionInstruction, sendAndConfirmTransaction } from '@solana/web3.js';
+
 
 
 
 function MyWallet() {
-  const wallet = useWallet();
+  const {wallet,  publicKey,sendTransaction} = useWallet();
+
+
+  const programPublicKey = new PublicKey(base58_to_binary(programAddr) );
+
 
   const {connection} = useConnection();
 
-  const [balance, setBalance] = useState(0);
+  const {info,setInfo } = useContext(User);
+
 
   const [amount, setAmount] = useState(0);
-  const [startdate, SetStartDate] = useState();
+  const [startdate, SetStartDate] = useState( new Date());
 
-  const [endDate, SetEndDate] = useState();
+  const [balance, setBalance] = useState(0);
+  
 
-  const [address, setAddress] = useState('');
+  const [endDate, SetEndDate] = useState( new Date());
+
+
 
   const [recipient, setRecipient] = useState('');
 
   const [subject, setSubject] = useState('');
 
-  useEffect(() => {
-    if(wallet.connected && wallet.publicKey) {
-      setAddress(wallet.publicKey.toString())
+  const handleClick = useCallback(async () => {
+    if (!publicKey) throw new WalletNotConnectedError();
 
-     connection.getBalance(wallet.publicKey).then((data) => setBalance(data));
-
-      console.log(balance);
-    }
-  },[address, wallet, connection, balance])
+    
 
 
-  async function initStream() {
-    // Current time as Unix timestamp
-    const  now = Math.floor(new Date().getTime() / 1000);
+    initStream(connection, publicKey)
 
-  }
+    
+
+    // const transaction = new Transaction().add(
+    //     SystemProgram.transfer({
+    //         fromPubkey: publicKey,
+    //         toPubkey: res,
+    //         lamports: amount,
+    //     })
+    // );
+
+    // const signature = await sendTransaction(transaction, connection);
+
+    // await connection.confirmTransaction(signature, 'processed');
+}, [publicKey, sendTransaction, connection]);
+
+
+
+
+
 
   
   const handlePlayment = async () => {
     const { connected, publicKey } = wallet;
     if (connected && publicKey) {
       const data = await connection.getAccountInfo(wallet.publicKey)
-     
     }
   }
 
-  const history = async () => {
-    const transactionHistory = await connection.getConfirmedSignaturesForAddress2(wallet.publicKey, {limit: 20})
-    console.log(transactionHistory);
-  }
 
   const getAirDrops = async () => {
-    const getAirDrops = await connection.requestAirdrop(wallet.publicKey, LAMPORTS_PER_SOL)
+    await connection.requestAirdrop(publicKey, LAMPORTS_PER_SOL)
 
-    console.log(getAirDrops);
+    connection.getBalance(publicKey).then((data) => setBalance(data/Math.pow(10,9)))
+     .catch((e) => console.log(e))
 
-    
+    setInfo(perstate => ({
+      ...perstate,
+      "balance": balance
+    }))
+
+
+
+    console.log(info)
   }
 
 
@@ -73,24 +101,22 @@ function MyWallet() {
       <>
         
           <Container>
-            <Typography>{balance}</Typography>
+            <Typography>{info.balance}</Typography>
             <Button onClick={getAirDrops}>Airdrops</Button>
             <LocalizationProvider dateAdapter={AdapterDateFns}> 
 
-               <Button onClick={history}>Get transaction history</Button>
                <Divider/>
                <FormControl style={{display: 'flex', flexDirection:'column', marginTop:'50px', maxWidth:'400px'}}>
                   <Box display={'flex'} flex="row" justifyContent={"space-between"}>
                       <Box >
                       <InputLabel>Amount</InputLabel>
-                      <Input aria-label='Amount' type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
+                      <Input  aria-label='Amount' type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
                       </Box>
                       <Box  >
                     
-                         <Select labelId="demo-simple-select-label"
-    id="demo-simple-select" label="token">
+                         
                                 <MenuItem value={"SOl"}>Sol</MenuItem>
-                          </Select>
+                    
 
                       </Box>
                      
@@ -126,6 +152,7 @@ function MyWallet() {
                   label="End Date & Time"
                     value={startdate}
                     onChange={(newValue) => {
+                      console.log(newValue);
                       SetStartDate(newValue);
                     }}
                   />
@@ -149,7 +176,7 @@ function MyWallet() {
 
 
                </FormControl>
-               <Button style={{marginTop: '20px'}} onClick={handlePlayment} variant='outlined' color="secondary">Send Transaction</Button>
+               <Button style={{marginTop: '20px'}} onClick={handleClick} variant='outlined' color="secondary">Send Transaction</Button>
 
               </LocalizationProvider>
               

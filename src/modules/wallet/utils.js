@@ -2,8 +2,14 @@ import BufferLayout from 'buffer-layout';
 
 // sol to lamport 10^9;
 //const BufferLayout = require("buffer-layout");
+import * as sol from '@solana/web3.js';
 
-const programAddr = "8B6xv2wbTjUawgV8tvPJwZtVdQ5V1qAXnmGpCbfs688E"
+export const programAddr = "8B6xv2wbTjUawgV8tvPJwZtVdQ5V1qAXnmGpCbfs688E"
+
+
+const cluster = sol.clusterApiUrl("devnet", true);
+
+
 
 export const initLayout = BufferLayout.struct([
   BufferLayout.u8('instruction'),
@@ -11,6 +17,9 @@ export const initLayout = BufferLayout.struct([
   BufferLayout.u32('endtime'),
   // N.B. Use something else, this goes up to 2^53
   BufferLayout.nu64('amount'),
+  BufferLayout.u32('total_events'),
+  BufferLayout.u32('triggered_events')
+
 ]);
 
 // This is the structure for the withdraw instruction
@@ -24,9 +33,12 @@ export  const withdrawLayout = BufferLayout.struct([
 export const cancelLayout = BufferLayout.struct([BufferLayout.u8('instruction')]);
 
 
-export async function initStream(connection) {
+export async function initStream(connection, alice) {
   // Current time as Unix timestamp
   var now = Math.floor(new Date().getTime() / 1000);
+
+
+  var bob = sol.Keypair.generate()
 
   var data = Buffer.alloc(initLayout.span);
   initLayout.encode(
@@ -47,9 +59,7 @@ export async function initStream(connection) {
   // is kept and updated by the program.
   const pda = new sol.Keypair();
 
-  console.log('ALICE: %s', alice.publicKey.toBase58());
-  console.log('BOB:   %s', bob.publicKey.toBase58());
-  console.log('PDA:   %s', pda.publicKey.toBase58());
+  
   console.log('DATA:', data);
 
   const instruction = new sol.TransactionInstruction({
@@ -85,7 +95,7 @@ export async function initStream(connection) {
   });
 
   // Transaction signed by Alice and the new pda.
-  tx = new sol.Transaction().add(instruction);
+  const tx = new sol.Transaction().add(instruction);
   return await sol.sendAndConfirmTransaction(connection, tx, [alice, pda]);
 }
 

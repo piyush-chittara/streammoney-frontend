@@ -41,7 +41,6 @@ export default function MyApp(props) {
   const devnet = WalletAdapterNetwork.Devnet;
 
 
-
   // You can also provide a custom RPC endpoint
   const endpoint = React.useMemo(() => clusterApiUrl(devnet), [devnet]);
 
@@ -66,7 +65,7 @@ export default function MyApp(props) {
 
     <Provider>
       <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets}>
+      <WalletProvider wallets={wallets} autoConnect>
       
        <CacheProvider value={emotionCache}>
               <Head>

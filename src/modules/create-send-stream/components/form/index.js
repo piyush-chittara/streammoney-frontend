@@ -106,6 +106,8 @@ export const SendStreamForm = ({ onSubmit, onClose }) => {
 
       await onSubmit(prepareValues(values));
 
+      console.log(prepareValues(values))
+
       setValues(initialValues);
       onClose();
     } catch (e) {
@@ -113,6 +115,8 @@ export const SendStreamForm = ({ onSubmit, onClose }) => {
       setLoading(false);
     }
   };
+
+  
 
   return (
     <Flex flexDirection="column" sx={{ mt: 2 }}>
