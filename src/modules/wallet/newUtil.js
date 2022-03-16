@@ -3,7 +3,7 @@ import BufferLayout from 'buffer-layout';
 const bs58 = require('bs58');
 import * as sol from '@solana/web3.js';
 
-export const programAddr = "8B6xv2wbTjUawgV8tvPJwZtVdQ5V1qAXnmGpCbfs688E"
+export const programAddr = "5nVGqBwnBCvGKUxxrj6rVYqGVMhpEdDniRdDn22Vgtnk"
 // import { bs58 } from 'bs58';
 
 
