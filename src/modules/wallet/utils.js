@@ -17,9 +17,8 @@ export const initLayout = BufferLayout.struct([
   BufferLayout.u32('endtime'),
   // N.B. Use something else, this goes up to 2^53
   BufferLayout.nu64('amount'),
-  BufferLayout.u32('total_events'),
-  BufferLayout.u32('triggered_events')
-
+  BufferLayout.u32('totalEvents'),
+  BufferLayout.u32('triggeredEvents'),
 ]);
 
 // This is the structure for the withdraw instruction

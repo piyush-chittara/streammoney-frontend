@@ -9,8 +9,9 @@ import React, { useState, useEffect, useContext, useCallback } from 'react';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { User } from 'src/context/UserContext';
+import * as sol from '@solana/web3.js';
 
-import {initLayout,programAddr, initStream} from './utils'
+import {initLayout,programAddr, initStreamNew,initStreamNew1} from './newUtil'
 
 import { Keypair, SystemProgram,PublicKey,  Transaction, TransactionInstruction, sendAndConfirmTransaction } from '@solana/web3.js';
 
@@ -18,7 +19,7 @@ import { Keypair, SystemProgram,PublicKey,  Transaction, TransactionInstruction,
 
 
 function MyWallet() {
-  const {wallet,  publicKey,sendTransaction} = useWallet();
+  const {wallet,  publicKey, sendTransaction} = useWallet();
 
 
   const programPublicKey = new PublicKey(base58_to_binary(programAddr) );
@@ -49,7 +50,7 @@ function MyWallet() {
     
 
 
-    initStream(connection, publicKey)
+    initStreamNew(connection, publicKey)
 
     
 
@@ -72,9 +73,9 @@ const newInitStream = useCallback( async() => {
 
   if (!publicKey) throw new WalletNotConnectedError();
 
-  const resBase = base58_to_binary(recipient);
+  // const resBase = base58_to_binary(recipient);
 
-  const res = new PublicKey(resBase)
+  const res = sol.Keypair.generate();
 
   const start = Math.floor(startdate.getTime() / 1000)
 
@@ -84,16 +85,19 @@ const newInitStream = useCallback( async() => {
 
   initLayout.encode(
     {
-      instruction: 0, 
-      starttime: start, 
-      endtime: end, 
-      amount: amount ,
-      total_events: 0, 
-      triggered_events: 0
+      // 0 means init in the Rust program.
+      instruction: 0,
+      // Unix timestamp when the stream should start unlocking.
+      starttime: start,
+      // Unix timestamp when the stream should finish and unlock everything.
+      endtime: end,
+      // Lamports to stream
+      amount: 1,
+      totalEvents: 0,
+      triggeredEvents: 0,
     },
     data,
-  )
-
+  );
 
   const pda =  Keypair.generate()
 
@@ -114,7 +118,7 @@ const newInitStream = useCallback( async() => {
       isWritable: true,
   }, {
       // Bob is the stream recipient.
-      pubkey: res,
+      pubkey: res.publicKey,
       isSigner: false,
       isWritable: true,
   }, {
@@ -135,24 +139,18 @@ const newInitStream = useCallback( async() => {
 
   console.log(instruction);
 
-  const tx = new Transaction()
-      .add(SystemProgram.transfer({
-        fromPubkey: publicKey,
-        toPubkey: res,
-        lamports: amount
-      }))
+  const transaction = new Transaction().add(
+    SystemProgram.transfer({
+      fromPubkey: publicKey,
+      toPubkey: res.publicKey,
+      lamports: 10,
+    })
+  );
 
-  await tx.add(
-    instruction
-  )
-  
-  const signature = await sendTransaction(tx, connection, [publicKey, pda]);
+  // transaction.add(instruction);
 
+  const signature = await sendTransaction(transaction, connection);
   return  await connection.confirmTransaction(signature, 'processed');
-
-
-  return await sendAndConfirmTransaction(connection, tx, [publicKey,programPublicKey ]);
-
 }, [publicKey, sendTransaction, connection])
 
 
