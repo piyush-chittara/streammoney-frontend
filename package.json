@@ -31,7 +31,8 @@
     "next": "latest",
     "prop-types": "latest",
     "react": "latest",
-    "react-dom": "latest"
+    "react-dom": "latest",
+    "use-local-storage": "^2.3.6"
   },
   "devDependencies": {
     "@svgr/webpack": "^6.2.1",

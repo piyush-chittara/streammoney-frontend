@@ -55,14 +55,13 @@ export const StreamsView = () => {
     getData()
   },[]) 
 
-  
+
 function convert() {
   const encodedData = data.result[0].account.data[0]
 
   console.log(data, "this si workinsdflkdsnmfk sd")
   const info = streamLayout.decode(Buffer.from(encodedData))
-      console.log(info)
-    // console.log(newData)
+  console.log(info)
 }
 
   return (
