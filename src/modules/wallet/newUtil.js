@@ -6,6 +6,23 @@ export const programAddr = "2SDZD4qRjff25ANjs3FxTSxFkWnJgHcykqYrfL8JcP6d"
 
 import { Connection, SystemProgram, Transaction, clusterApiUrl } from '@solana/web3.js';
 
+
+export const streamLayout = BufferLayout.struct([
+  BufferLayout.nu64('start_time'),
+  BufferLayout.nu64('end_time'),
+  BufferLayout.nu64('amount'),
+  // N.B. Use something else, this goes up to 2^53
+  BufferLayout.nu64('withdrawn'),
+  BufferLayout.u8('sender'),
+  BufferLayout.u8('recipient'),
+  BufferLayout.u32('total_events'),
+  BufferLayout.u32('triggered_events'),
+  BufferLayout.nu64('stream_resume_time'),
+  BufferLayout.nu64('unlocked_amount'),
+  BufferLayout.u8('state'),
+]);
+
+
 export const initLayout = BufferLayout.struct([
     BufferLayout.u8('instruction'),
     BufferLayout.u32('starttime'),
@@ -14,11 +31,16 @@ export const initLayout = BufferLayout.struct([
     BufferLayout.nu64('amount'),
     BufferLayout.u32('totalEvents'),
     BufferLayout.u32('triggeredEvents'),
+
   ]);
 
-  export async function initStreamNew(connection, alice) {
+  export async function initStreamNew(connection,recipient,  startTime, endtime) {
     // Current time as Unix timestamp
     var now = Math.floor(new Date().getTime() / 1000);
+
+    var startType = Math.floor( startTime / 1000);
+
+    var endType = Math.floor( endtime / 1000);
   
     var bob = sol.Keypair.generate()
   
@@ -30,11 +52,12 @@ export const initLayout = BufferLayout.struct([
         // Unix timestamp when the stream should start unlocking.
         starttime: now + 10,
         // Unix timestamp when the stream should finish and unlock everything.
-        endtime: now + 61000,
+        endtime: now + 1000,
         // Lamports to stream
-        amount: 1,
+        amount: 100,
         totalEvents: 0,
         triggeredEvents: 0,
+
       },
       data,
     );

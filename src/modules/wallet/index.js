@@ -50,7 +50,7 @@ function MyWallet() {
     
 
 
-    initStreamNew(connection, publicKey)
+    initStreamNew(connection,recipient,  startdate, endDate)
 
     
 
