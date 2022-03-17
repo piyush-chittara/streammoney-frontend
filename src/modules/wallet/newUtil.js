@@ -6,6 +6,14 @@ export const programAddr = "2SDZD4qRjff25ANjs3FxTSxFkWnJgHcykqYrfL8JcP6d"
 
 import { Connection, SystemProgram, Transaction, clusterApiUrl } from '@solana/web3.js';
 
+const publicKey = (property = "publicKey") => {
+  return BufferLayout.blob(32, property);
+};
+
+const uint64 = (property = "uint64") => {
+  return BufferLayout.blob(8, property);
+};
+
 
 export const streamLayout = BufferLayout.struct([
   BufferLayout.nu64('start_time'),
@@ -13,8 +21,8 @@ export const streamLayout = BufferLayout.struct([
   BufferLayout.nu64('amount'),
   // N.B. Use something else, this goes up to 2^53
   BufferLayout.nu64('withdrawn'),
-  BufferLayout.u8('sender'),
-  BufferLayout.u8('recipient'),
+  publicKey('sender'),
+  publicKey('recipient'),
   BufferLayout.u32('total_events'),
   BufferLayout.u32('triggered_events'),
   BufferLayout.nu64('stream_resume_time'),
@@ -29,8 +37,8 @@ export const initLayout = BufferLayout.struct([
     BufferLayout.u32('endtime'),
     // N.B. Use something else, this goes up to 2^53
     BufferLayout.nu64('amount'),
-    BufferLayout.u32('totalEvents'),
-    BufferLayout.u32('triggeredEvents'),
+    BufferLayout.u32('total_events'),
+    BufferLayout.u32('triggered_events'),
 
   ]);
 
@@ -55,8 +63,8 @@ export const initLayout = BufferLayout.struct([
         endtime: now + 1000,
         // Lamports to stream
         amount: 100,
-        totalEvents: 0,
-        triggeredEvents: 0,
+        total_events: 0,
+        triggered_events: 0,
 
       },
       data,
@@ -126,6 +134,8 @@ export const initLayout = BufferLayout.struct([
       transaction.addSignature(wallet.publicKey, signature);
       transaction.partialSign(...[pda]);
       let txid = await connection.sendRawTransaction(transaction.serialize())
+      console.log("TxID is: "+txid);
+      console.log("PDA is: "+pda.publicKey);
       return await connection.confirmTransaction(txid);
       
     // return await window.solana.signAndSendTransaction(tran);
@@ -142,4 +152,28 @@ export const initLayout = BufferLayout.struct([
     // return await sol.sendAndConfirmTransaction(connection, tx, [alice, pda]);
   }
 
-  
+  export async function getStreamList(connection){
+    let wallet = window.solana;
+    await wallet.connect();
+    const account = await connection.getParsedProgramAccounts(new sol.PublicKey(programAddr),
+    {
+      filters: [
+        {
+          memcmp: {
+            offset: 32, // 32 for sender, 64 for receiver
+            bytes: wallet.publicKey, // base58 encoded string
+          },
+        },
+      ],
+    }
+    );
+    console.log(account[0]['pubkey'])
+    const accountInfo = await connection.getAccountInfo(account[0]['pubkey'])
+    // const accountInfo = await connection.getAccountInfo(new sol.PublicKey("DonPZJoR9eMNB1ote6X38LhCXWSW1RrjRbpdeWjDnq9R"))
+    if (accountInfo === null) {
+      throw 'Error: cannot find the greeted account'
+  }
+  console.log('Raw account info', accountInfo.data)
+  const info = streamLayout.decode(Buffer.from(accountInfo.data))
+  console.log(info)
+  }
