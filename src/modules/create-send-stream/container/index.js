@@ -7,7 +7,7 @@ export const CreateSendStreamContainer = () => {
    * @param {object} input input params
    */
   const onSubmit = (input) => {
-    console.log(input);
+    
   };
 
   return <CreateSendStreamView onSubmit={onSubmit} />;

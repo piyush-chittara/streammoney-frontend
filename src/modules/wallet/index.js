@@ -1,46 +1,161 @@
 import { Button, Container, Divider, FormControl, Input, InputLabel, Select , MenuItem,Text, TextField, Box, Typography} from '@mui/material';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import { base58_to_binary } from 'base58-js';
 
-import {
-  useAnchorWallet,
-  useConnection,
-  useWallet,
-} from '@solana/wallet-adapter-react';
-import {
-  WalletModalProvider,
-  WalletDisconnectButton,
-  WalletMultiButton,
-} from '@solana/wallet-adapter-react-ui';
-import { useEffect, useState } from 'react';
 import DateTimePicker from '@mui/lab/DateTimePicker';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import { WalletNotConnectedError } from '@solana/wallet-adapter-base';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import { LAMPORTS_PER_SOL } from '@solana/web3.js';
+import { User } from 'src/context/UserContext';
+import * as sol from '@solana/web3.js';
+
+import {initLayout,programAddr, initStreamNew,initStreamNew1} from './newUtil'
+
+import { Keypair, SystemProgram,PublicKey,  Transaction, TransactionInstruction, sendAndConfirmTransaction } from '@solana/web3.js';
+
+
 
 
 function MyWallet() {
+  const {wallet,  publicKey, sendTransaction} = useWallet();
 
-  const wallet = useWallet();
+
+  const programPublicKey = new PublicKey(base58_to_binary(programAddr) );
 
 
-  const { connection} = useConnection();
+  const {connection} = useConnection();
 
-  const [balance, setBalance] = useState(0);
+  const {info,setInfo } = useContext(User);
+
 
   const [amount, setAmount] = useState(0);
-  const [startdate, SetStartDate] = useState();
+  const [startdate, SetStartDate] = useState( new Date());
 
-  const [endDate, SetEndDate] = useState();
+  const [balance, setBalance] = useState(0);
+  
 
-  const [address, setAddress] = useState('');
+  const [endDate, SetEndDate] = useState( new Date());
+
+
 
   const [recipient, setRecipient] = useState('');
 
   const [subject, setSubject] = useState('');
 
-  useEffect(() => {
-    if(wallet.connected && wallet.publicKey) {
-      setAddress(wallet.publicKey.toString())
-    }
-  },[address, wallet])
+  const handleClick = useCallback(async () => {
+    if (!publicKey) throw new WalletNotConnectedError();
+
+    
+
+
+    initStreamNew(connection, publicKey)
+
+    
+
+    // const transaction = new Transaction().add(
+    //     SystemProgram.transfer({
+    //         fromPubkey: publicKey,
+    //         toPubkey: res,
+    //         lamports: amount,
+    //     })
+    // );
+
+    // const signature = await sendTransaction(transaction, connection);
+
+    // await connection.confirmTransaction(signature, 'processed');
+}, [publicKey, sendTransaction, connection]);
+
+
+
+const newInitStream = useCallback( async() => {
+
+  if (!publicKey) throw new WalletNotConnectedError();
+
+  // const resBase = base58_to_binary(recipient);
+
+  const res = sol.Keypair.generate();
+
+  const start = Math.floor(startdate.getTime() / 1000)
+
+  const end = Math.floor(endDate.getTime() / 1000);
+
+  let data = Buffer.alloc(initLayout.span);
+
+  initLayout.encode(
+    {
+      // 0 means init in the Rust program.
+      instruction: 0,
+      // Unix timestamp when the stream should start unlocking.
+      starttime: start,
+      // Unix timestamp when the stream should finish and unlock everything.
+      endtime: end,
+      // Lamports to stream
+      amount: 1,
+      totalEvents: 0,
+      triggeredEvents: 0,
+    },
+    data,
+  );
+
+  const pda =  Keypair.generate()
+
+  console.log(recipient);
+
+  
+
+  console.log('this is the recipient key', res);
+
+  
+
+  const instruction = new TransactionInstruction({
+    programId: programPublicKey,
+    data: data,
+    keys: [{
+      pubkey: publicKey,
+      isSigner: true,
+      isWritable: true,
+  }, {
+      // Bob is the stream recipient.
+      pubkey: res.publicKey,
+      isSigner: false,
+      isWritable: true,
+  }, {
+      // pda is the account that will be created.
+      // It shall contain the locked funds and necessary metadata.
+      pubkey: pda.publicKey,
+      isSigner: true,
+      isWritable: true,
+  }, {
+      // This is the system program public key.
+      
+      pubkey: SystemProgram.programId,
+      isSigner: false,
+      isWritable: false,
+  }],
+ 
+  })
+
+  console.log(instruction);
+
+  const transaction = new Transaction().add(
+    SystemProgram.transfer({
+      fromPubkey: publicKey,
+      toPubkey: res.publicKey,
+      lamports: 10,
+    })
+  );
+
+  // transaction.add(instruction);
+
+  const signature = await sendTransaction(transaction, connection);
+  return  await connection.confirmTransaction(signature, 'processed');
+}, [publicKey, sendTransaction, connection])
+
+
+
+
 
 
   
@@ -48,48 +163,47 @@ function MyWallet() {
     const { connected, publicKey } = wallet;
     if (connected && publicKey) {
       const data = await connection.getAccountInfo(wallet.publicKey)
-     
     }
   }
 
-  const history = async () => {
-    const transactionHistory = await connection.getConfirmedSignaturesForAddress2(wallet.publicKey, {limit: 20})
 
-    console.log(transactionHistory);
+  const getAirDrops = async () => {
+    await connection.requestAirdrop(publicKey, LAMPORTS_PER_SOL)
 
+    connection.getBalance(publicKey).then((data) => setBalance(data/Math.pow(10,9)))
+     .catch((e) => console.log(e))
+
+    setInfo(perstate => ({
+      ...perstate,
+      "balance": balance
+    }))
+
+
+
+    console.log(info)
   }
 
 
   return (
       <>
-        <div className="multi-wrapper">
-              <span className="button-wrapper">
-                  <WalletModalProvider>
-                      <WalletMultiButton />
-                  </WalletModalProvider>
-              </span>
-              
-          </div>
-          {wallet.connected &&
+        
           <Container>
+            <Typography>{info.balance}</Typography>
+            <Button onClick={getAirDrops}>Airdrops</Button>
             <LocalizationProvider dateAdapter={AdapterDateFns}> 
 
-               <p>Your wallet is {address}</p> 
-               <p>your Account value is  {balance}</p>
-               <Button onClick={history}>Get transaction history</Button>
                <Divider/>
                <FormControl style={{display: 'flex', flexDirection:'column', marginTop:'50px', maxWidth:'400px'}}>
                   <Box display={'flex'} flex="row" justifyContent={"space-between"}>
                       <Box >
                       <InputLabel>Amount</InputLabel>
-                      <Input aria-label='Amount' type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
+                      <Input  aria-label='Amount' type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
                       </Box>
                       <Box  >
                     
-                         <Select labelId="demo-simple-select-label"
-    id="demo-simple-select" label="token">
+                         
                                 <MenuItem value={"SOl"}>Sol</MenuItem>
-                          </Select>
+                    
 
                       </Box>
                      
@@ -125,6 +239,7 @@ function MyWallet() {
                   label="End Date & Time"
                     value={startdate}
                     onChange={(newValue) => {
+                      console.log(newValue);
                       SetStartDate(newValue);
                     }}
                   />
@@ -148,16 +263,12 @@ function MyWallet() {
 
 
                </FormControl>
-               <Button style={{marginTop: '20px'}} onClick={handlePlayment} variant='outlined' color="secondary">Send Transaction</Button>
+               <Button style={{marginTop: '20px'}} onClick={handleClick} variant='outlined' color="secondary">Send Transaction</Button>
 
               </LocalizationProvider>
               
           </Container>
-             ||
-              <p>Hello! Click the button to connect</p>
-             
-          }
-
+        
         
       </>
   );
