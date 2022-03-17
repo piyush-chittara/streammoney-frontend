@@ -60,7 +60,7 @@ function Activity() {
     }
 
     return ( 
-        <Container>
+        <Container >
             <Modal
         open={open}
         onClose={handleClose}
@@ -81,7 +81,7 @@ function Activity() {
           </Button>
         </Box>
       </Modal>
-            <Container style={{display: 'flex', justifyContent:'space-between'}}>
+            <Container style={{display: 'flex', justifyContent:'space-between', marginTop:'20px'}}>
 
 <Container>
     <Typography variant='h4' style={{fontWeight:'900', color:"eeeee"}}> Address Book </Typography>
@@ -100,7 +100,7 @@ function Activity() {
 </Container>
 
 
-<Button onClick={handleOpen}>New contact</Button>
+<Button variant="outlined" style={{maxHeight: '50px'}} onClick={handleOpen}>New contact</Button>
 
 </Container>
 
