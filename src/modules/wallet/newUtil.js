@@ -2,7 +2,7 @@ import BufferLayout from 'buffer-layout';
 // sol to lamport 10^9;
 const bs58 = require('bs58');
 import * as sol from '@solana/web3.js';
-export const programAddr = "5nVGqBwnBCvGKUxxrj6rVYqGVMhpEdDniRdDn22Vgtnk"
+export const programAddr = "2SDZD4qRjff25ANjs3FxTSxFkWnJgHcykqYrfL8JcP6d"
 
 import { Connection, SystemProgram, Transaction, clusterApiUrl } from '@solana/web3.js';
 
@@ -101,7 +101,7 @@ export const initLayout = BufferLayout.struct([
       });
       const signature = bs58.decode(signed.signature)
       transaction.addSignature(wallet.publicKey, signature);
-    //   transaction.partialSign(...[pda]);
+      transaction.partialSign(...[pda]);
       let txid = await connection.sendRawTransaction(transaction.serialize())
       return await connection.confirmTransaction(txid);
       
