@@ -7,9 +7,10 @@ export default function Index() {
   return (
     <Container maxWidth="100%">
 
-      <StreamsContainer />
 
       <h1>Streams</h1>
+      <StreamsContainer />
+
       <MyWallet/>
 
     </Container>

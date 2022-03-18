@@ -15,6 +15,8 @@ const uint64 = (property = "uint64") => {
 };
 
 
+
+
 export const streamLayout = BufferLayout.struct([
   BufferLayout.nu64('start_time'),
   BufferLayout.nu64('end_time'),
@@ -155,6 +157,8 @@ export const initLayout = BufferLayout.struct([
   export async function getStreamList(connection){
     let wallet = window.solana;
     await wallet.connect();
+    connection = new Connection(clusterApiUrl('devnet'));
+
     const account = await connection.getParsedProgramAccounts(new sol.PublicKey(programAddr),
     {
       filters: [
@@ -167,10 +171,10 @@ export const initLayout = BufferLayout.struct([
       ],
     }
     );
-    console.log(account[0]['pubkey'])
+    console.log('this is the account info', account)
     const accountInfo = await connection.getAccountInfo(account[0]['pubkey'])
     // const accountInfo = await connection.getAccountInfo(new sol.PublicKey("DonPZJoR9eMNB1ote6X38LhCXWSW1RrjRbpdeWjDnq9R"))
-    if (accountInfo === null) {
+  if (accountInfo === null) {
       throw 'Error: cannot find the greeted account'
   }
   console.log('Raw account info', accountInfo.data)

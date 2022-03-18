@@ -14,6 +14,7 @@ import * as sol from '@solana/web3.js';
 import {initLayout,programAddr, initStreamNew,initStreamNew1} from './newUtil'
 
 import { Keypair, SystemProgram,PublicKey,  Transaction, TransactionInstruction, sendAndConfirmTransaction } from '@solana/web3.js';
+import { JustifyBetween } from '@shared/components/flex';
 
 
 
@@ -52,19 +53,6 @@ function MyWallet() {
 
     initStreamNew(connection,recipient,  startdate, endDate)
 
-    
-
-    // const transaction = new Transaction().add(
-    //     SystemProgram.transfer({
-    //         fromPubkey: publicKey,
-    //         toPubkey: res,
-    //         lamports: amount,
-    //     })
-    // );
-
-    // const signature = await sendTransaction(transaction, connection);
-
-    // await connection.confirmTransaction(signature, 'processed');
 }, [publicKey, sendTransaction, connection]);
 
 
@@ -168,17 +156,18 @@ const newInitStream = useCallback( async() => {
 
 
   const getAirDrops = async () => {
-    await connection.requestAirdrop(publicKey, LAMPORTS_PER_SOL)
+    await connection.requestAirdrop(publicKey, LAMPORTS_PER_SOL )
 
     connection.getBalance(publicKey).then((data) => setBalance(data/Math.pow(10,9)))
      .catch((e) => console.log(e))
 
-    setInfo(perstate => ({
-      ...perstate,
-      "balance": balance
-    }))
+    const newData = {...info}
 
+    newData['balance'] = balance
 
+    console.log
+
+    setInfo(newData)
 
     console.log(info)
   }
@@ -187,9 +176,16 @@ const newInitStream = useCallback( async() => {
   return (
       <>
         
-          <Container>
-            <Typography>{info.balance}</Typography>
-            <Button onClick={getAirDrops}>Airdrops</Button>
+          <Container style={{marginTop:'100px'}}>
+            <Container maxWidth="xs" style={{alignContent:'flex-start'}}>
+            <JustifyBetween >
+              <Typography>Balance</Typography>
+            <Typography> {info.balance} Sol</Typography>
+            </JustifyBetween>
+
+            </Container>
+           
+            <Button variant={'contained'} onClick={getAirDrops}>Airdrops</Button>
             <LocalizationProvider dateAdapter={AdapterDateFns}> 
 
                <Divider/>
@@ -200,9 +196,7 @@ const newInitStream = useCallback( async() => {
                       <Input  aria-label='Amount' type="number" value={amount} onChange={(e) => setAmount(e.target.value)} />
                       </Box>
                       <Box  >
-                    
-                         
-                                <MenuItem value={"SOl"}>Sol</MenuItem>
+                           <MenuItem value={"SOl"}>Sol</MenuItem>
                     
 
                       </Box>

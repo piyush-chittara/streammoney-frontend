@@ -7,7 +7,11 @@ import { JustifyBetween } from '@shared/components/flex';
 import { Filters } from '../stream-filters';
 import { StreamTable } from '../stream-table';
 
-import { streamLayout } from '@modules/wallet/newUtil';
+import { getStreamList, streamLayout, programAddr } from '@modules/wallet/newUtil';
+import { clusterApiUrl, Connection, PublicKey } from '@solana/web3.js';
+import { useConnection, useWallet } from '@solana/wallet-adapter-react';
+import BasicTable from './BasicTable';
+
 
 
 
@@ -20,58 +24,63 @@ export const StreamsView = () => {
     setFilters((prev) => ({ ...prev, ...filter }));
   };
 
+  const {publicKey} = useWallet()
+
+  const {connection} = useConnection();
+
+  
+  
+
   const resetFilters = () => setFilters({});
 
-  useEffect(() => {
-    async function getData() {
-      const listData = await fetch('https://api.devnet.solana.com', {
-        method:"POST", 
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          "jsonrpc": "2.0",
-          "id": "123124",
-          "method": "getProgramAccounts",
-          "params": [
-            "2SDZD4qRjff25ANjs3FxTSxFkWnJgHcykqYrfL8JcP6d",
-             {
-                  "encoding": "base64",
-                  "commitment": "confirmed"
-             }
-          ]
+ useEffect(() => {
+   async function getStreamData() {
+      const account = await  connection.getParsedProgramAccounts(new PublicKey(programAddr), 
+      {
+        filters: [
+          {
+            memcmp: {
+              offset: 32, // 32 for sender, 64 for receiver
+              bytes: publicKey, // base58 encoded string
+            },
+          },
+        ],
+      } )
+
+      if(account === null) {
+        throw 'You have not created a stream'
       }
-      )
+      let streamdata = [];
+
+      const convertdata = account.map( async (e, i) => {
+        const accountinfo = await connection.getAccountInfo(account[i]['pubkey'])
+       const decodedData = streamLayout.decode(Buffer.from(accountinfo.data))
+
+       streamdata.push(decodedData)
       })
+      console.log(streamdata)
+    
+      setData(streamdata)
+   }
 
-      const jsonData = await listData.json()
+   if(publicKey) {
+    getStreamData();  
+return 
+   }
 
-      const encodedData = jsonData.result[0].account.data
+ }, [ publicKey])
 
-      console.log(jsonData)
-      setData(jsonData);
-    }
-
-    getData()
-  },[]) 
-
-
-function convert() {
-  const encodedData = data.result[0].account.data[0]
-
-  console.log(data, "this si workinsdflkdsnmfk sd")
-  const info = streamLayout.decode(Buffer.from(encodedData))
-  console.log(info)
-}
 
   return (
     <Container maxWidth="100%">
-      <button onClick={() => convert()}>convert</button>
-      <JustifyBetween paddingY={2}>
-        <Typography variant="h4">Streams</Typography>
-        <Filters onFilterChange={onFilterChange} />
-      </JustifyBetween>
-      <StreamTable filters={filters} resetFilters={resetFilters} />
+     {
+       data ? 
+       <BasicTable data={data}/>: 
+       <div>
+         Create Your first stream
+       </div>
+
+     }
 
 
     </Container>
