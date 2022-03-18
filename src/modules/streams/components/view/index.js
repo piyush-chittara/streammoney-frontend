@@ -11,27 +11,25 @@ import { getStreamList, streamLayout, programAddr } from '@modules/wallet/newUti
 import { clusterApiUrl, Connection, PublicKey } from '@solana/web3.js';
 import { useConnection, useWallet } from '@solana/wallet-adapter-react';
 import BasicTable from './BasicTable';
+import { Keypair } from '@solana/web3.js';
+
 
 
 
 
 export const StreamsView = () => {
-  const [filters, setFilters] = useState({});
 
   const [data, setData] = useState();
 
-  const onFilterChange = (filter = {}) => {
-    setFilters((prev) => ({ ...prev, ...filter }));
-  };
+  const [dt, setDt] = useState()
+
+
 
   const {publicKey} = useWallet()
 
   const {connection} = useConnection();
 
-  
-  
 
-  const resetFilters = () => setFilters({});
 
  useEffect(() => {
    async function getStreamData() {
@@ -71,11 +69,42 @@ return
  }, [ publicKey])
 
 
+
+useEffect(() => {
+  if(data) {
+    const newData = data.map( (el) => {
+      const startTime = new Date(el.start_time * 1000).toUTCString();
+    
+      const endTime = new Date(el.end_time * 1000).toUTCString();
+    
+      const sender =  Keypair.fromSeed(el.sender ).publicKey.toString()
+      const recipient =  Keypair.fromSeed(el.recipient).publicKey.toString();
+    
+      const amount = el.amount
+    
+      const jsondata = {
+        "start_time": startTime, 
+        "end_time": endTime,
+        "sender": sender, 
+        "recipient": recipient, 
+        "amount": amount
+      
+      }
+      return jsondata
+    })
+
+  }
+ 
+   
+  setDt(newData);
+},[dt,data])
+
+
   return (
     <Container maxWidth="100%">
      {
        data ? 
-       <BasicTable data={data}/>: 
+       <BasicTable data={dt}/>: 
        <div>
          Create Your first stream
        </div>
