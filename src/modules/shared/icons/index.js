@@ -1,10 +1,27 @@
 import SvgIcon from '@mui/material/SvgIcon';
+import AddIcon from '@mui/icons-material/Add';
+import RemoveIcon from '@mui/icons-material/Remove';
+import CloseIcon from '@mui/icons-material/Close';
+import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
+
+import { CANCELED, WITHDREW, STREAMING, DEPOSITED } from '@constants/activites';
 
 import EtherSVG from '@assets/svg/ethereum-eth-logo.svg';
 import BitcoinSVG from '@assets/svg/bitcoin-btc-logo.svg';
 import SolanaSVG from '@assets/svg/solana-sol-logo.svg';
 import RippleSVG from '@assets/svg/xrp-xrp-logo.svg';
 import BinanceSVG from '@assets/svg/bnb-bnb-logo.svg';
+
+export const LinkIcon = (props) => {
+  return (
+    <SvgIcon {...props}>
+      <path
+        fill="currentColor"
+        d="M14,3V5H17.59L7.76,14.83L9.17,16.24L19,6.41V10H21V3M19,19H5V5H12V3H5C3.89,3 3,3.9 3,5V19A2,2 0 0,0 5,21H19A2,2 0 0,0 21,19V12H19V19Z"
+      />
+    </SvgIcon>
+  );
+};
 
 export const NoDataIcon = (props) => {
   return (
@@ -68,3 +85,13 @@ const IconMap = {
 export const getCryptoIcon = (crypto) => {
   return IconMap[crypto];
 };
+
+const ACTIVITY_ICON = {
+  [CANCELED]: CloseIcon,
+  [WITHDREW]: RemoveIcon,
+  [STREAMING]: ArrowRightAltIcon,
+  [DEPOSITED]: AddIcon,
+};
+
+export const getActivityIcon = (activity) =>
+  activity ? ACTIVITY_ICON[activity] : null;
